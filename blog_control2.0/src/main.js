@@ -8,7 +8,7 @@ import '../src/assets/css/global.css'
 // 导入axios
 import axios from 'axios'
 //配置请求根路径
-axios.defaults.baseURL = 'http://www.jibei66.com:8686/'
+axios.defaults.baseURL = 'http://127.0.0.1:8877/'
 Vue.prototype.$http = axios
 
 axios.interceptors.request.use(config=>{

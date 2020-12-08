@@ -26,7 +26,7 @@ export default {
             let oldname = decodeURIComponent(data.split("?")[1]);
             if(oldname===`category=${category}&name=${name}`) return
             this.$router.push({
-                path:`/clarticle?category=${category}&name=${name}`,
+                path:`/blog/clarticle?category=${category}&name=${name}`,
             })
         }
     },

@@ -6,14 +6,17 @@
                 <span><span class="hide">jibei·</span>极北</span>
             </a>
             <ul>
-                <li @click="move('/articlelist')">主页</li>
-                <li @click="move('/allarticle')">归档</li>
-                <li @click="move('/me')">关于我</li>
+                <li @click="move('/blog/articlelist')">主页</li>
+                <li @click="move('/blog/allarticle')">归档</li>
+                <li @click="move('/blog/me')">关于我</li>
                 <!--清除浮动样式-->
                 <div style="clear:both;"></div>
             </ul>
-            <input type="text" class="search" v-model="searchdata" @keydown.enter="search" placeholder="搜索">
-            <img src="../assets/搜索.png" alt="" class="searchicon" @click="search">
+            <div class="serchbox">
+                <input type="text" class="search" v-model="searchdata" @keydown.enter="search" placeholder="搜索">
+                <img src="../assets/搜索.png" alt="" class="searchicon" @click="search">
+            </div>
+            <button class="my-button login" @click="login">登录</button>
         </div>
     </div>
 </template>
@@ -43,8 +46,11 @@ export default {
                 this.searchdata = ''
                 return
             }
-            this.$router.push(`/search?searchtitle=${this.searchdata}`)
+            this.$router.push(`/blog/search?searchtitle=${this.searchdata}`)
             this.searchdata = ''
+        },
+        login(){
+            this.$router.push('/login')
         }
     },
 }
@@ -112,6 +118,11 @@ export default {
                     }
                 }
             }
+            .serchbox{
+                position: relative;
+                margin-left: auto;
+                margin-right: 20px;
+            }
             .search{
                 box-sizing: border-box;
 	            outline: none;
@@ -123,7 +134,6 @@ export default {
                 width: 300px;
                 margin-top: 13px;
                 font-size: 16px;
-                margin-left: auto;
             }
             .searchicon{
                 width: 30px;
@@ -133,6 +143,10 @@ export default {
                 right: 7px;
                 top: 16px;
                 cursor: pointer;
+            }
+            .login{
+                height: 40px;
+                margin: auto 0;
             }
         }
     }

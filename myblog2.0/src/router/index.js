@@ -7,17 +7,22 @@ import allarticle from '../components/allarticle.vue'
 import me from '../components/me.vue'
 import search from '../components/search.vue'
 import clarticle from '../components/classarticle.vue'
+import blog from '../views/blog.vue'
+import login from '../views/login.vue'
 
 Vue.use(VueRouter)
 
   const routes = [
-    {path:'/',redirect:'/articlelist'},
-    {path:'/articlelist',component:articleList},
-    {path:'/readarticle',component:readarticle},
-    {path:'/allarticle',component:allarticle},
-    {path:'/me',component:me},
-    {path:'/search',component:search},
-    {path:'/clarticle',component:clarticle}
+    {path:'/login',component:login},
+    {path:'/',redirect:'/blog/articlelist'},
+    {path:'/blog',component:blog, children:[
+      {path:'/blog/articlelist',component:articleList},
+      {path:'/blog/readarticle',component:readarticle},
+      {path:'/blog/allarticle',component:allarticle},
+      {path:'/blog/me',component:me},
+      {path:'/blog/search',component:search},
+      {path:'/blog/clarticle',component:clarticle}
+    ]},
   ]
 
 const router = new VueRouter({

@@ -21,7 +21,7 @@ const userrouter = new Router()
         const password = ctx.request.body.password;        
         // console.log(ctx.request.body);
         const connection = await Mysql.createConnection(mysql_nico)
-        const sql = `SELECT * FROM user where username = '${username}' and password= '${password}'`;
+        const sql = `SELECT * FROM user where username = '${username}' and password= '${password}' and userlevel = 1`;
         const [rs] = await connection.query(sql);
         if(rs.length===1){
             let userToken = {

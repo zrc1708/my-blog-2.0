@@ -55,8 +55,23 @@ export default {
         this.getLabels(),
         this.getArticlesCount(),
         this.getImage()
+        this.login()
   },
   methods: {
+    async login(){
+      // 没有设置自动登录
+      if(!this.$cookie.get('rememberme')) return
+      // 用户已手动登录
+      if(this.$store.state.userName) return
+
+      let {data:res} =await this.$http.post('/automaticlogin')
+      if(res.code==200){
+        this.$store.commit('setUserName',res.rs[0].username)
+        this.$store.commit('setUserId',res.rs[0].id)
+        this.$cookie.set('rememberme',true,{expires: 7})
+      }
+      
+    },
     // cloud子组件点击事件，返回值为被点击的元素名称
     gotoclass(name){
       let data=window.location.href;

@@ -1,4 +1,9 @@
+
+
 (async function run() {
+    const Format = require('./util')
+    Format()
+
     var fs = require('fs')
     //加载依赖
     const Koa = require('koa'); //引入koa框架

@@ -8,7 +8,7 @@
             <ul>
                 <li @click="move('/blog/articlelist')">主页</li>
                 <li @click="move('/blog/allarticle')">归档</li>
-                <li @click="move('/blog/me')">关于我</li>
+                <li @click="move('/blog/me')">关于站长</li>
                 <!--清除浮动样式-->
                 <div style="clear:both;"></div>
             </ul>
@@ -16,7 +16,9 @@
                 <input type="text" class="search" v-model="searchdata" @keydown.enter="search" placeholder="搜索">
                 <img src="../assets/搜索.png" alt="" class="searchicon" @click="search">
             </div>
-            <button class="my-button login" @click="login">登录</button>
+            <span class="username" v-if="$store.state.userName">你好，{{$store.state.userName}}</span>
+            <button class="my-button login" @click="login" v-if="!$store.state.userName">登录</button>
+            <button class="my-button login" @click="logout" v-else>登出</button>
         </div>
     </div>
 </template>
@@ -24,7 +26,7 @@
 export default {
     data () {
         return {
-            searchdata:''      
+            searchdata:''
         }
     },
     methods: {
@@ -51,6 +53,11 @@ export default {
         },
         login(){
             this.$router.push('/login')
+        },
+        logout(){
+            this.$store.commit('setUserName','')
+            this.$store.commit('setUserId','')
+            this.$cookie.remove('rememberme')
         }
     },
 }
@@ -147,6 +154,11 @@ export default {
             .login{
                 height: 40px;
                 margin: auto 0;
+            }
+            .username{
+                line-height: 60px;
+                margin-right: 20px;
+                font-size: 16px;
             }
         }
     }

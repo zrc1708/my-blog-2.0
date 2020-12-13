@@ -66,10 +66,12 @@
 
     const articlerouter = require('./blog.js')
     const userrouter = require('./userrouter.js')
+    const filerouter = require('./filerouter.js')
 
     app.use(router.routes());//挂载路由
     app.use(articlerouter.routes());
     app.use(userrouter.routes());
+    app.use(filerouter.routes());
 
 
     app.listen(8877, () => {});

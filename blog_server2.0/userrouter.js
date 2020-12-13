@@ -2,6 +2,8 @@ const Router = require('koa-router')
 const Mysql = require('mysql2/promise'); //引入mysql,mysql依赖
 const mysql_nico = require('./mysql.js')// 导入数据库登录信息
 const jwt = require('jsonwebtoken')
+const path = require('path');
+const fs = require("fs");
 
 const userrouter = new Router()
 
@@ -131,23 +133,27 @@ userrouter.post('/checkuser', async ctx => {
     }
 });
 
-    // 用户注册接口
-    userrouter.post('/adduser', async function (ctx) {
-        const username = ctx.request.body.username;        
-        const password = ctx.request.body.password;  
-        const time = new Date().Format("yyyy-MM-dd hh:mm:ss");
+// 用户注册接口
+userrouter.post('/adduser', async function (ctx) {
+    const username = ctx.request.body.username;        
+    const password = ctx.request.body.password;  
+    const time = new Date().Format("yyyy-MM-dd hh:mm:ss");
 
-        const connection = await Mysql.createConnection(mysql_nico)
-        const sql = `INSERT INTO user ( username,password,birthtime) VALUES ( '${username}','${password}','${time}');`
-        const [rs] = await connection.query(sql);
-    
-        connection.end(function(err){})
-    
-        return ctx.body = {
-            arr:rs,
-            code:200,
-        };
-    });
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `INSERT INTO user ( username,password,birthtime) VALUES ( '${username}','${password}','${time}');`
+    const [rs] = await connection.query(sql);
+
+    connection.end(function(err){})
+
+    // 为用户初始化文件夹
+    const filePath = path.join(__dirname,'files',username)
+    fs.mkdirSync(filePath);
+
+    return ctx.body = {
+        arr:rs,
+        code:200,
+    };
+});
     
 
 module.exports = userrouter

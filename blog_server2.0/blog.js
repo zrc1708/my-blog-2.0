@@ -307,41 +307,41 @@ articlerouters.post('/addLabel', async function (ctx) {
 });
 
 // 文件上传接口
-articlerouters.post('/uploadfile', async (ctx, next) => {
-    // 测试上传路径的获取
-    let title = ctx.request.body.title
-    let detail = ctx.request.body.detail
-    let datetime = ctx.request.body.datetime
-    let sortid = ctx.request.body.sortid
-    let labelid = ctx.request.body.labelid
+// articlerouters.post('/uploadfile', async (ctx, next) => {
+//     // 测试上传路径的获取
+//     let title = ctx.request.body.title
+//     let detail = ctx.request.body.detail
+//     let datetime = ctx.request.body.datetime
+//     let sortid = ctx.request.body.sortid
+//     let labelid = ctx.request.body.labelid
 
-    // 上传单个文件
-    const file = ctx.request.files.file; // 获取上传文件
+//     // 上传单个文件
+//     const file = ctx.request.files.file; // 获取上传文件
 
-    // // 将文件信息写入数据库
-    const connection = await Mysql.createConnection(mysql_nico)
-    const sql = `INSERT INTO article ( title, detail , date , sortid , labelid , mdname ) 
-                VALUES ( '${title}', '${detail}','${datetime}',
-                ${sortid} , ${labelid} ,'${file.name}');`
-    const [rs] = await connection.query(sql);
+//     // // 将文件信息写入数据库
+//     const connection = await Mysql.createConnection(mysql_nico)
+//     const sql = `INSERT INTO article ( title, detail , date , sortid , labelid , mdname ) 
+//                 VALUES ( '${title}', '${detail}','${datetime}',
+//                 ${sortid} , ${labelid} ,'${file.name}');`
+//     const [rs] = await connection.query(sql);
  
-    connection.end(function(err){
-        //连接结束
-    })
+//     connection.end(function(err){
+//         //连接结束
+//     })
 
-    // 创建可读流
-    const reader = fs.createReadStream(file.path);
+//     // 创建可读流
+//     const reader = fs.createReadStream(file.path);
 
-    let filePath = path.join(__dirname+'/static/') + `${file.name}`;
-    // 创建可写流
-    const upStream = fs.createWriteStream(filePath);
-    // 可读流通过管道写入可写流
-    reader.pipe(upStream);
-    return ctx.body = {
-        message:"上传成功！",
-        code:200,
-        };
-  });
+//     let filePath = path.join(__dirname+'/static/') + `${file.name}`;
+//     // 创建可写流
+//     const upStream = fs.createWriteStream(filePath);
+//     // 可读流通过管道写入可写流
+//     reader.pipe(upStream);
+//     return ctx.body = {
+//         message:"上传成功！",
+//         code:200,
+//         };
+//   });
   
 // 获取文章
 articlerouters.get('/readarticle/:id', async function (ctx) {

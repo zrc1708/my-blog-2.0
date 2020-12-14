@@ -62,4 +62,34 @@ filerouter.post('/getfile', async ctx => {
     }
 });
 
+// 文件上传接口
+filerouter.post('/uploadfile', async (ctx, next) => {
+    // 测试上传路径的获取
+    const savepath = ctx.request.body.savePath
+    // 上传单个文件
+    const file = ctx.request.files.file; // 获取上传文件
+    // 将文件信息写入数据库
+    // let category = file.name.split('.')[file.name.split('.').length-1]
+    // let date = getdate(file.lastModifiedDate)
+    // let size = getsize(file.size+'')
+    // const connection = await Mysql.createConnection(mysql_nico)
+    // const sql = `INSERT INTO file ( name, path , type , size , birthtime ) 
+    //             VALUES ( '${file.name}', './${savepath+'/'+file.name}','${category}','${size}','${date}' );`
+    // const [rs] = await connection.query(sql);
+    // connection.end(function(err){})
+
+    // 创建可读流
+    const reader = fs.createReadStream(file.path);
+    let filePath = path.join(__dirname,'files', savepath+'',file.name);
+    // 创建可写流
+    const upStream = fs.createWriteStream(filePath);
+    // 可读流通过管道写入可写流
+    reader.pipe(upStream);
+
+    return ctx.body = {
+        message:"上传成功！",
+        code:200,
+    };
+});
+
 module.exports = filerouter

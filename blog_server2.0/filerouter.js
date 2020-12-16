@@ -65,7 +65,7 @@ filerouter.post('/getfile', async ctx => {
 // 文件上传接口
 filerouter.post('/uploadfile', async (ctx, next) => {
     // 测试上传路径的获取
-    const savepath = ctx.request.body.savePath
+    const savepath = ctx.request.body.savePath.split(',')
     // 上传单个文件
     const file = ctx.request.files.file; // 获取上传文件
     // 将文件信息写入数据库
@@ -80,7 +80,11 @@ filerouter.post('/uploadfile', async (ctx, next) => {
 
     // 创建可读流
     const reader = fs.createReadStream(file.path);
-    let filePath = path.join(__dirname,'files', savepath+'',file.name);
+
+    savepath.unshift(__dirname,'files')
+    savepath.push(file.name)
+
+    let filePath = path.join(...savepath);
     // 创建可写流
     const upStream = fs.createWriteStream(filePath);
     // 可读流通过管道写入可写流
@@ -90,6 +94,19 @@ filerouter.post('/uploadfile', async (ctx, next) => {
         message:"上传成功！",
         code:200,
     };
+});
+
+//创建文件夹接口
+filerouter.post('/mkdir', async ctx => {
+    const userpath = ctx.request.body.path; 
+    userpath.unshift(__dirname,'files')
+    let filePath = path.join(...userpath);
+    fs.mkdirSync(filePath);
+
+    ctx.body={
+        message:'文件夹创建成功',
+        code:200
+    }
 });
 
 module.exports = filerouter

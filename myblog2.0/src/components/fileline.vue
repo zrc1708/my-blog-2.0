@@ -11,7 +11,7 @@
             <span v-show="file.type!='dir'">删除</span>
             <span v-show="file.type!='dir'">重命名</span>
             <span v-show="file.type!='dir'">复制提取码</span>
-            <span v-show="file.type=='dir'">进入</span>
+            <span v-show="file.type=='dir'" @click="cd">进入</span>
         </div>
     </div>
 </template>
@@ -54,33 +54,17 @@ export default {
             }else if( type=='pdf'){
                 return pdf
             }else if(type=='dir'){  
-
-
-
-
-
-
-
-
-
-
-
-
-
-                
-                
-                
-                
-                
-                
-                
- 
- return dir
+                return dir
             }else{
                 return other
             }
         }
     },
+    methods:{
+        cd(){
+            this.$emit('cd',this.file)
+        }
+    }
 }
 </script>
 

@@ -5,14 +5,22 @@
             <button class="my-button btn">提取文件</button>
         </div>
         <div class="controlrow">
-            <button class="my-button btn2">创建文件夹</button>
+            <button class="my-button btn2" @click="mkdir">创建文件夹</button>
             <button class="my-button btn2" @click="choosefile">选择文件</button>
             <span>{{this.choosedFileName}}</span>
             <button class="my-button btn2" @click="uploadFile" v-show="choosedFileName">上传文件</button>
             <input id="flieinput" type="file" ref="file" @change="checkField($event)">
         </div>
+        <div class="pathrow">
+            <span class="pathname" @click="basepath">根目录</span>
+            <span v-for="(item,index) in pathArr" :key="item">
+                <span class="pathicon">></span>
+                <span class="pathname" @click="pathClick(item,index)">{{item.name}}</span>
+            </span>
+        </div>
         <div class="row2">
-            <my-fileline v-for="file in filesList" :key="file" :file="file"></my-fileline>
+            <my-fileline v-for="file in filesList" :key="file" 
+            :file="file" @cd='cd'></my-fileline>
         </div>
     </div>
 </template>
@@ -24,7 +32,9 @@ export default {
     data(){
         return {
             choosedFileName:'',
+            filesListArr:[],
             filesList:'',
+            pathArr:[]
         }
     },
     mounted(){
@@ -36,8 +46,9 @@ export default {
             if(username){
                 let {data} =await this.$http.post('/getfile',{username:username})
                 if(data.code==200){
+                    this.filesListArr = [data.arr]
                     this.filesList = data.arr
-                    console.log(this.filesList);
+                    this.pathArr = []
                 }
             }else{
                 setTimeout(() => {
@@ -59,8 +70,13 @@ export default {
         async uploadFile(){
             let username = this.$store.state.userName
 
+            let path = [this.$store.state.userName]
+            this.pathArr.forEach(item => {
+                path.push(item.name)
+            });
+
             let formData = new FormData();
-            formData.append('savePath', username);
+            formData.append('savePath', path);
             formData.append('file', this.$refs.file.files[0])
 
             let {data} =await this.$http.post(`/uploadfile`, formData, {
@@ -68,6 +84,44 @@ export default {
             })
             if(data.code==200){
                 this.choosedFileName = ''
+                this.getAllFiles()
+                alert('上传成功')
+            }
+        },
+        // 进入文件夹
+        cd(file){
+            this.filesListArr.push(file.child)
+            this.filesList = file.child
+            this.pathArr.push(file)
+        },
+        // 文件路径点击
+        pathClick(file,index){
+            console.log(this.pathArr);
+            console.log(this.filesListArr);
+            this.pathArr.splice(index+1)
+            this.filesListArr.splice(index+2)
+            this.filesList = this.filesListArr[this.filesListArr.length-1]
+        },
+        // 返回根目录
+        basepath(){
+            this.getAllFiles()
+        },
+        // 创建文件夹
+        async mkdir(){
+            let dirname = prompt('请输入文件夹名')
+            if(dirname==''){
+                return alert('请不要输入空文件名')
+            }
+
+            let path = [this.$store.state.userName]
+            this.pathArr.forEach(item => {
+                path.push(item.name)
+            });
+            path.push(dirname)
+
+            let {data} = await this.$http.post('/mkdir',{path})
+            if(data.code==200){
+                alert('创建成功')
                 this.getAllFiles()
             }
         }
@@ -116,5 +170,23 @@ export default {
 }
 .row2{
     border-top: 1px solid #eeeeee;
+}
+.pathrow{
+    font-size: 15px;
+
+    .pathicon{
+        font-size: 17px;
+        color: #9e9e9e;
+    }
+    .pathname{
+        display: inline-block;
+        padding: 5px;
+        cursor: pointer;
+        color: #38b7ea;
+
+        &:hover{
+            text-decoration: underline;
+        }
+    }
 }
 </style>

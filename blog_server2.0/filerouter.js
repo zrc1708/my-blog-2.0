@@ -20,10 +20,20 @@ var getsize = function(val){
 
 //查询所有文件
 filerouter.post('/getfile', async ctx => {
+
+    let userpath
+    if(typeof ctx.request.body.path == 'string'){
+        userpath = ctx.request.body.path.split(',')
+    }else{
+        userpath = ctx.request.body.path
+    }
+    
     // 获取进行文件查找的路径
-    const username = ctx.request.body.username; 
+    userpath.unshift(__dirname,'files')
+
     //设置根目录
-    const root = path.join(__dirname,'files',username)
+    const root = path.join(...userpath);
+
     var arr = [];
     //调用函数遍历根目录，同时传递 文件夹路径和对应的数组
     //请使用同步读取
@@ -47,8 +57,8 @@ filerouter.post('/getfile', async ctx => {
                 fileObj.type = 'dir';
                 fileObj.child = [];
                 arr.push(fileObj);
-                //递归调用
-                fileDisplay(filePath, arr[i].child);
+                //如需递归遍历子文件，使用下行
+                // fileDisplay(filePath, arr[i].child);
             } else {
                 //不是文件夹,则添加type属性为文件后缀名
                 fileObj.type = path.extname(filesList[i]).substring(1);
@@ -101,12 +111,45 @@ filerouter.post('/mkdir', async ctx => {
     const userpath = ctx.request.body.path; 
     userpath.unshift(__dirname,'files')
     let filePath = path.join(...userpath);
-    fs.mkdirSync(filePath);
 
-    ctx.body={
-        message:'文件夹创建成功',
-        code:200
+    let code=200
+    try {
+        fs.mkdirSync(filePath,);
+    } catch (error) {
+        if(error.code=='EEXIST'){
+            code=400
+        }
     }
+    
+    ctx.body={
+        code
+    }
+});
+
+// 重命名文件接口
+filerouter.post('/rename', async function (ctx) {
+    const oldname = ctx.request.body.oldname
+    const newname = path.join(...ctx.request.body.newname)
+
+    // const newfilename = newname.split('/')[newname.split('/').length-1]
+
+    // 更改文件数据库状态
+    // const connection = await Mysql.createConnection(mysql_nico)
+    // const sql = `UPDATE file SET name = '${newfilename}' , path = '${newname} '
+    //             WHERE path = '${oldname}' and state = 1;`
+    // const [rs] = await connection.query(sql);
+    // connection.end(function(err){})
+
+    await fs.rename(oldname.trim(),newname.trim(),(error) => {
+        if (error) {
+            throw error
+        } 
+    })
+
+    return ctx.body = {
+        message:"重命名成功！",
+        code:200,
+    };
 });
 
 module.exports = filerouter

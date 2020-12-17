@@ -9,7 +9,7 @@
         </div>
         <div class="control">
             <span v-show="file.type!='dir'">删除</span>
-            <span v-show="file.type!='dir'">重命名</span>
+            <span v-show="file.type!='dir'" @click="rename">重命名</span>
             <span v-show="file.type!='dir'">复制提取码</span>
             <span v-show="file.type=='dir'" @click="cd">进入</span>
         </div>
@@ -61,8 +61,13 @@ export default {
         }
     },
     methods:{
+        // 进入文件夹
         cd(){
             this.$emit('cd',this.file)
+        },
+        // 重命名
+        rename(){
+            this.$emit('rename',this.file)
         }
     }
 }

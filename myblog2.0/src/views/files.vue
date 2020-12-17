@@ -19,8 +19,9 @@
             </span>
         </div>
         <div class="row2">
-            <my-fileline v-for="file in filesList" :key="file" 
-            :file="file" @cd='cd'></my-fileline>
+            <my-fileline v-for="file in filesList" :key="file" :file="file" 
+            @cd='cd'
+            @rename='rename'></my-fileline>
         </div>
     </div>
 </template>
@@ -41,10 +42,9 @@ export default {
         this.getAllFiles()
     },
     methods:{
-        async getAllFiles(){
-            let username = this.$store.state.userName
-            if(username){
-                let {data} =await this.$http.post('/getfile',{username:username})
+        async getAllFiles(path=this.$store.state.userName){
+            if(path){
+                let {data} =await this.$http.post('/getfile',{path})
                 if(data.code==200){
                     this.filesListArr = [data.arr]
                     this.filesList = data.arr
@@ -54,6 +54,17 @@ export default {
                 setTimeout(() => {
                     this.getAllFiles()
                 }, 50);
+            }
+        },
+        // 根据当前路径获取文件
+        async getFilesByPath(){
+            let path = [this.$store.state.userName]
+            this.pathArr.forEach(item =>{
+                path.push(item.name)
+            })
+            let {data} =await this.$http.post('/getfile',{path})
+            if(data.code==200){
+                this.filesList = data.arr
             }
         },
         // 监听文件上传input的改变
@@ -84,23 +95,19 @@ export default {
             })
             if(data.code==200){
                 this.choosedFileName = ''
-                this.getAllFiles()
+                this.getFilesByPath()
                 alert('上传成功')
             }
         },
         // 进入文件夹
         cd(file){
-            this.filesListArr.push(file.child)
-            this.filesList = file.child
             this.pathArr.push(file)
+            this.getFilesByPath()
         },
         // 文件路径点击
         pathClick(file,index){
-            console.log(this.pathArr);
-            console.log(this.filesListArr);
             this.pathArr.splice(index+1)
-            this.filesListArr.splice(index+2)
-            this.filesList = this.filesListArr[this.filesListArr.length-1]
+            this.getFilesByPath()
         },
         // 返回根目录
         basepath(){
@@ -109,8 +116,8 @@ export default {
         // 创建文件夹
         async mkdir(){
             let dirname = prompt('请输入文件夹名')
-            if(dirname==''){
-                return alert('请不要输入空文件名')
+            if(dirname==''||dirname==null){
+                return
             }
 
             let path = [this.$store.state.userName]
@@ -121,8 +128,31 @@ export default {
 
             let {data} = await this.$http.post('/mkdir',{path})
             if(data.code==200){
+                this.getFilesByPath()
                 alert('创建成功')
-                this.getAllFiles()
+            }else if(data.code==400){
+                alert('创建失败，文件夹重名')
+            }
+        },
+        // 重命名
+        async rename(file){
+            let newname = prompt('请输入新文件名')
+            if(newname==''||newname==null){
+                return 
+            }
+            
+            let oldPathArr = file.path.split('\\')
+            oldPathArr[oldPathArr.length-1]=newname+'.'+file.type
+
+            const data = {
+                oldname:file.path,
+                newname:oldPathArr
+            }
+
+            let {data:res} = await this.$http.post('/rename',data)
+            if(res.code==200){
+                this.getFilesByPath()
+                alert('重命名成功')
             }
         }
     },

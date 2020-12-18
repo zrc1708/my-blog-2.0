@@ -11,9 +11,8 @@ export default {
 </script>
 <style lang="less" scoped>
     div{
-        margin-top: 65px;
         text-align: center;
-        margin-bottom: 5rem;
+        margin-bottom: 1em;
         span{
             display: block;
         }

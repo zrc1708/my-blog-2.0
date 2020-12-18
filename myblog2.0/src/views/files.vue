@@ -21,7 +21,8 @@
         <div class="row2">
             <my-fileline v-for="file in filesList" :key="file" :file="file" 
             @cd='cd'
-            @rename='rename'></my-fileline>
+            @rename='rename'
+            @remove='remove'></my-fileline>
         </div>
     </div>
 </template>
@@ -80,6 +81,7 @@ export default {
         // 上传文件
         async uploadFile(){
             let username = this.$store.state.userName
+            let userid = this.$store.state.userId
 
             let path = [this.$store.state.userName]
             this.pathArr.forEach(item => {
@@ -88,6 +90,7 @@ export default {
 
             let formData = new FormData();
             formData.append('savePath', path);
+            formData.append('userid', userid);
             formData.append('file', this.$refs.file.files[0])
 
             let {data} =await this.$http.post(`/uploadfile`, formData, {
@@ -97,6 +100,9 @@ export default {
                 this.choosedFileName = ''
                 this.getFilesByPath()
                 alert('上传成功')
+            }else if(data.code==400){
+                alert('上传失败，文件名存在非法的特殊字符')
+                this.choosedFileName = ''
             }
         },
         // 进入文件夹
@@ -146,13 +152,34 @@ export default {
 
             const data = {
                 oldname:file.path,
-                newname:oldPathArr
+                newname:oldPathArr,
+                name:file.name,
+                userid:this.$store.state.userId
             }
 
             let {data:res} = await this.$http.post('/rename',data)
             if(res.code==200){
                 this.getFilesByPath()
                 alert('重命名成功')
+            }else{
+                alert('重命名失败，重名了')
+            }
+        },
+        // 删除
+        async remove(file){
+            if(!confirm('确定要删除吗')){
+                return
+            }
+            let data = {
+                path: file.path,
+                type: file.type
+            }
+            let {data:res} = await this.$http.post('/remove',data)
+            if(res.code==200){
+                this.getFilesByPath()
+                alert('删除成功')
+            }else{
+                alert('删除失败')
             }
         }
     },

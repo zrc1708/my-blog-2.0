@@ -8,7 +8,7 @@
             <span v-show="file.type!='dir'">{{file.size}}</span>
         </div>
         <div class="control">
-            <span v-show="file.type!='dir'">删除</span>
+            <span @click="remove">删除</span>
             <span v-show="file.type!='dir'" @click="rename">重命名</span>
             <span v-show="file.type!='dir'">复制提取码</span>
             <span v-show="file.type=='dir'" @click="cd">进入</span>
@@ -68,6 +68,10 @@ export default {
         // 重命名
         rename(){
             this.$emit('rename',this.file)
+        },
+        // 删除
+        remove(){
+            this.$emit('remove',this.file)
         }
     }
 }

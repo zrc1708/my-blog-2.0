@@ -23,8 +23,6 @@
     </div>
     <!-- github快捷按钮 -->
     <my-github></my-github>
-    <!-- 底部备案信息 -->
-    <my-foot></my-foot>
   </div>
 </template>
 <script>
@@ -34,7 +32,6 @@ import myarticle from '../components/article.vue'
 import blackboard from '../components/blackboard.vue'
 import mycloud from '../components/cloud.vue'
 import github from '../components/github.vue'
-import foot from '../components/foot.vue'
 
 export default {
   components:{
@@ -44,7 +41,6 @@ export default {
     'my-blackboard':blackboard,
     'my-mycloud':mycloud,
     'my-github':github,
-    'my-foot':foot
   },
   data() {
     return {

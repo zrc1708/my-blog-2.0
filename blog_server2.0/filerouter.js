@@ -18,6 +18,23 @@ var getsize = function(val){
     }
 }
 
+// 递归删除文件夹
+function delDir(path){
+    let files = [];
+    if(fs.existsSync(path)){
+        files = fs.readdirSync(path);
+        files.forEach((file, index) => {
+            let curPath = path + "/" + file;
+            if(fs.statSync(curPath).isDirectory()){
+                delDir(curPath); //递归删除文件夹
+            } else {
+                fs.unlinkSync(curPath); //删除文件
+            }
+        });
+        fs.rmdirSync(path);
+    }
+}
+
 //查询所有文件
 filerouter.post('/getfile', async ctx => {
 
@@ -74,19 +91,19 @@ filerouter.post('/getfile', async ctx => {
 
 // 文件上传接口
 filerouter.post('/uploadfile', async (ctx, next) => {
-    // 测试上传路径的获取
+    // 上传路径的获取
     const savepath = ctx.request.body.savePath.split(',')
     // 上传单个文件
     const file = ctx.request.files.file; // 获取上传文件
-    // 将文件信息写入数据库
-    // let category = file.name.split('.')[file.name.split('.').length-1]
-    // let date = getdate(file.lastModifiedDate)
-    // let size = getsize(file.size+'')
-    // const connection = await Mysql.createConnection(mysql_nico)
-    // const sql = `INSERT INTO file ( name, path , type , size , birthtime ) 
-    //             VALUES ( '${file.name}', './${savepath+'/'+file.name}','${category}','${size}','${date}' );`
-    // const [rs] = await connection.query(sql);
-    // connection.end(function(err){})
+    // 用户的id
+    const id = ctx.request.body.userid
+
+    if(file.name.indexOf(',')!==-1){
+        return ctx.body = {
+            message:"文件名非法",
+            code:400,
+        };
+    }
 
     // 创建可读流
     const reader = fs.createReadStream(file.path);
@@ -99,6 +116,21 @@ filerouter.post('/uploadfile', async (ctx, next) => {
     const upStream = fs.createWriteStream(filePath);
     // 可读流通过管道写入可写流
     reader.pipe(upStream);
+
+    // 将文件信息写入数据库
+    let category = file.name.split('.')[file.name.split('.').length-1]
+    let size = getsize(file.size+'')
+
+    let sqlFilePath = './files'
+    ctx.request.body.savePath.split(',').forEach(item=>{
+        sqlFilePath=sqlFilePath+'/'+item
+    })
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `INSERT INTO files ( name, path , type , size ,userid) 
+                VALUES ( '${file.name}', '${sqlFilePath}','${category}','${size}', '${id}');`
+    const [rs] = await connection.query(sql);
+    connection.end(function(err){})
 
     return ctx.body = {
         message:"上传成功！",
@@ -130,24 +162,76 @@ filerouter.post('/mkdir', async ctx => {
 filerouter.post('/rename', async function (ctx) {
     const oldname = ctx.request.body.oldname
     const newname = path.join(...ctx.request.body.newname)
+    const name = ctx.request.body.name
+    const userid = ctx.request.body.userid
 
-    // const newfilename = newname.split('/')[newname.split('/').length-1]
+    console.log(oldname);
+
+    // 检测新文件名是否重名
+    try {
+        fs.readFileSync(newname);
+    } catch (error) {
+        if(error.code =='ENOENT'){
+            
+            await fs.rename(oldname.trim(),newname.trim(),(error) => {
+                if (error) {
+                    throw error
+                } 
+            })
+
+            // 更改文件数据库状态
+            // const newfilename = ctx.request.body.newname[ctx.request.body.newname.length-1]
+            // const connection = await Mysql.createConnection(mysql_nico)
+            // const sql = `UPDATE files SET name = '${newfilename}' 
+            //             WHERE path = '${oldname}' and name = '${name}' and userid = '${userid}';`
+            // const [rs] = await connection.query(sql);
+            // connection.end(function(err){})
+
+            return ctx.body ={
+                code:200
+            }
+        }
+    }
+
+    ctx.body ={
+        code:400
+    }    
+});
+
+// 删除文件接口
+filerouter.post('/remove', async function (ctx) {
+    const path = ctx.request.body.path
+    const type = ctx.request.body.type
 
     // 更改文件数据库状态
     // const connection = await Mysql.createConnection(mysql_nico)
-    // const sql = `UPDATE file SET name = '${newfilename}' , path = '${newname} '
-    //             WHERE path = '${oldname}' and state = 1;`
+    // const sql = `UPDATE file SET state = 0 WHERE 
+    //             path like '%${path}%';`
     // const [rs] = await connection.query(sql);
     // connection.end(function(err){})
 
-    await fs.rename(oldname.trim(),newname.trim(),(error) => {
-        if (error) {
-            throw error
-        } 
-    })
+    if(type==='dir'){
+        await delDir(path);//删除文件夹
+    }else{
+        await fs.unlink(path.trim(), (err) => {
+            if (err) throw err;
+        });
+    }
+    return ctx.body = {
+        message:"删除文件成功！",
+        code:200,
+    };
+});
+
+// 获取所有文件
+filerouter.get('/getallfilesbysql', async function (ctx) {
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `Select * from files ;`
+    const [rs] = await connection.query(sql);
 
     return ctx.body = {
-        message:"重命名成功！",
+        rs,
         code:200,
     };
 });

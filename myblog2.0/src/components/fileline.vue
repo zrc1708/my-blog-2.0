@@ -9,7 +9,7 @@
         </div>
         <div class="control">
             <span @click="remove">删除</span>
-            <span v-show="file.type!='dir'" @click="rename">重命名</span>
+            <!-- <span v-show="file.type!='dir'" @click="rename">重命名</span> -->
             <span v-show="file.type!='dir'">复制提取码</span>
             <span v-show="file.type=='dir'" @click="cd">进入</span>
         </div>

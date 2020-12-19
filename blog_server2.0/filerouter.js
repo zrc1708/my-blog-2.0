@@ -35,6 +35,20 @@ function delDir(path){
     }
 }
 
+//  生成提取码
+function generateMixed(n) {
+    // 去除了容易混淆的字符
+    let chars = ['2','3','4','5','6','7','8','9',
+                'A','B','C','D','E','F','G','H','J','K','M','N','P','Q','R','S','T','U','V','W','X','Y','Z'];
+
+    let res = "";
+    for(let i = 0; i < n ; i ++) {
+        let id = Math.ceil(Math.random()*(chars.length-1));
+        res += chars[id];
+    }
+    return res;
+}
+
 //查询所有文件
 filerouter.post('/getfile', async ctx => {
 
@@ -117,19 +131,34 @@ filerouter.post('/uploadfile', async (ctx, next) => {
     // 可读流通过管道写入可写流
     reader.pipe(upStream);
 
-    // 将文件信息写入数据库
+    // 准备数据库所需的文件类型和大小
     let category = file.name.split('.')[file.name.split('.').length-1]
     let size = getsize(file.size+'')
 
+    // 链接数据库
+    const connection = await Mysql.createConnection(mysql_nico)
+
+    // 生成唯一的提取码
+    let sql = `Select code from files ;`
+    let [rs] = await connection.query(sql);
+    let codeArr = rs.map(item=>{
+        return item.code
+    })
+    let code = generateMixed(4)
+    while (codeArr.indexOf(code)!==-1) {
+        code = generateMixed(4)
+    }
+
+    // 准备数据库用的文件路径
     let sqlFilePath = './files'
     ctx.request.body.savePath.split(',').forEach(item=>{
         sqlFilePath=sqlFilePath+'/'+item
     })
+    sqlFilePath=sqlFilePath+'/'+file.name
 
-    const connection = await Mysql.createConnection(mysql_nico)
-    const sql = `INSERT INTO files ( name, path , type , size ,userid) 
-                VALUES ( '${file.name}', '${sqlFilePath}','${category}','${size}', '${id}');`
-    const [rs] = await connection.query(sql);
+    sql = `INSERT INTO files ( name, path , type , size ,userid ,code) 
+                VALUES ( '${file.name}', '${sqlFilePath}','${category}','${size}', '${id}','${code}');`
+    const [rs2] = await connection.query(sql);
     connection.end(function(err){})
 
     return ctx.body = {
@@ -203,12 +232,13 @@ filerouter.post('/remove', async function (ctx) {
     const path = ctx.request.body.path
     const type = ctx.request.body.type
 
+    let sqlpath = path.replace('E:\\Desktop\\my-blog-2.0\\blog_server2.0\\','./').replace(/\\/g,'/')
     // 更改文件数据库状态
-    // const connection = await Mysql.createConnection(mysql_nico)
-    // const sql = `UPDATE file SET state = 0 WHERE 
-    //             path like '%${path}%';`
-    // const [rs] = await connection.query(sql);
-    // connection.end(function(err){})
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `DELETE FROM files
+                WHERE path like '${sqlpath}%'`
+    const [rs] = await connection.query(sql);
+    connection.end(function(err){})
 
     if(type==='dir'){
         await delDir(path);//删除文件夹
@@ -234,6 +264,56 @@ filerouter.get('/getallfilesbysql', async function (ctx) {
         rs,
         code:200,
     };
+});
+
+// 提取文件
+filerouter.post('/getfilebycode', async function (ctx) {
+    const code = ctx.request.body.code
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `Select * from files where code = '${code}';`
+    const [rs] = await connection.query(sql);
+
+    return ctx.body = {
+        rs,
+        code:200,
+    };
+});
+
+// 文件下载
+filerouter.get('/downloadfile', async function (ctx) {
+    // const code = ctx.request.body.code
+
+    // const connection = await Mysql.createConnection(mysql_nico)
+    // const sql = `Select * from files where code = '${code}';`
+    // const [rs] = await connection.query(sql);
+
+    // return ctx.body = {
+    //     rs,
+    //     code:200,
+    // };
+
+    // const name = ctx.params.path;
+    // console.log(ctx.query.path);
+
+    // 设置实体头（表示消息体的附加信息的头字段）,提示浏览器以文件下载的方式打开
+    // 也可以直接设置 ctx.set("Content-disposition", "attachment; filename=" + fileName);
+    // ctx.attachment(filename);
+    // await send(ctx, filename, { root: __dirname + '/'+filepath });
+
+    let path = ctx.query.path
+    let name = ctx.query.name
+    path = path.slice(1).replace(`/${name}`,'')
+// console.log(path);
+    // console.log(name);
+    // console.log( __dirname +path);
+
+    ctx.attachment(name);
+    await send(ctx, name, { root: __dirname +path});
+
+    // ctx.attachment('野兽先辈.jpg');
+    // await send(ctx, '野兽先辈.jpg', { root: __dirname +'\\files\\zhangsan' });
+    
 });
 
 module.exports = filerouter

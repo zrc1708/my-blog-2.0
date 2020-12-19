@@ -1,8 +1,9 @@
 <template>
     <div id="app">
         <div class="row1">
-            <input type="text" class="my-input codeinput">
-            <button class="my-button btn">提取文件</button>
+            <input type="text" class="my-input codeinput" v-model="code">
+            <button class="my-button btn" @click="getFileByCode">提取文件</button>
+            <a style="display: none;" href="" ref="a" target="_self"></a>
         </div>
         <div class="controlrow">
             <button class="my-button btn2" @click="mkdir">创建文件夹</button>
@@ -36,7 +37,8 @@ export default {
             choosedFileName:'',
             filesListArr:[],
             filesList:'',
-            pathArr:[]
+            pathArr:[],
+            code:''
         }
     },
     mounted(){
@@ -141,30 +143,30 @@ export default {
             }
         },
         // 重命名
-        async rename(file){
-            let newname = prompt('请输入新文件名')
-            if(newname==''||newname==null){
-                return 
-            }
+        // async rename(file){
+        //     let newname = prompt('请输入新文件名')
+        //     if(newname==''||newname==null){
+        //         return 
+        //     }
             
-            let oldPathArr = file.path.split('\\')
-            oldPathArr[oldPathArr.length-1]=newname+'.'+file.type
+        //     let oldPathArr = file.path.split('\\')
+        //     oldPathArr[oldPathArr.length-1]=newname+'.'+file.type
 
-            const data = {
-                oldname:file.path,
-                newname:oldPathArr,
-                name:file.name,
-                userid:this.$store.state.userId
-            }
+        //     const data = {
+        //         oldname:file.path,
+        //         newname:oldPathArr,
+        //         name:file.name,
+        //         userid:this.$store.state.userId
+        //     }
 
-            let {data:res} = await this.$http.post('/rename',data)
-            if(res.code==200){
-                this.getFilesByPath()
-                alert('重命名成功')
-            }else{
-                alert('重命名失败，重名了')
-            }
-        },
+        //     let {data:res} = await this.$http.post('/rename',data)
+        //     if(res.code==200){
+        //         this.getFilesByPath()
+        //         alert('重命名成功')
+        //     }else{
+        //         alert('重命名失败，重名了')
+        //     }
+        // },
         // 删除
         async remove(file){
             if(!confirm('确定要删除吗')){
@@ -180,6 +182,19 @@ export default {
                 alert('删除成功')
             }else{
                 alert('删除失败')
+            }
+        },
+        // 提取文件
+        async getFileByCode(){
+            let {data:res} = await this.$http.post('/getfilebycode',{code:this.code})
+            if(res.code==200){
+                if(!confirm(`确定要下载${res.rs[0].name}吗`)){
+                    return
+                }
+                let a = this.$refs.a
+                a.setAttribute('href', `http://127.0.0.1:8877/downloadfile?path=${res.rs[0].path}&name=${res.rs[0].name}`)
+                a.setAttribute('download', `${res.rs[0].name}`)
+                a.click()
             }
         }
     },

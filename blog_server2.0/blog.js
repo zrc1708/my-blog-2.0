@@ -478,4 +478,69 @@ articlerouters.post('/searchArticles', async function (ctx) {
     };
 });
 
+// 文章评论
+articlerouters.post('/publishcomment', async function (ctx) {
+    const {recommend,content,userid,articleid} = ctx.request.body
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `INSERT INTO comment ( content, articleid , userid , recommend ) 
+                VALUES ( '${content}', '${articleid}','${userid}',${recommend});`
+    const [rs] = await connection.query(sql);
+    connection.end(function(err){})
+
+    return ctx.body = {
+        arr:rs,
+        code:200,
+    };
+});
+
+// 获取对应文章评论总数，好评率
+articlerouters.get('/getcommentcount/:articleid', async function (ctx) {
+    let articleid = ctx.params.articleid
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `select * from comment
+                where  comment.articleid = '${articleid}';`
+    const [rs] = await connection.query(sql);
+    connection.end(function(err){})
+
+    // 统计好评数
+    let recommend = 0
+    rs.forEach(item => {
+        if(item.recommend==1){
+            recommend++
+        }
+    });
+
+    ctx.body = {
+        code: 200,
+        tips: 'ok',
+        total: rs.length,
+        recommend
+    }
+});
+
+// 获取文章评论
+articlerouters.get('/getcomment/:articleid/:pagesize/:currentpage', async function (ctx) {
+    let articleid = ctx.params.articleid
+
+    let currentpage = ctx.params.currentpage
+    let pagesize = ctx.params.pagesize
+    let num = (currentpage-1)*pagesize
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `select comment.id ,comment.content ,comment.articleid ,comment.userid
+                 ,comment.recommend ,user.username
+                from comment,user 
+                where comment.articleid = '${articleid}' and comment.userid = user.id
+                order by comment.id desc limit ${num} , ${pagesize};`
+    const [rs] = await connection.query(sql);
+    connection.end(function(err){})
+
+    return ctx.body = {
+        arr:rs,
+        code:200,
+    };
+});
+
 module.exports = articlerouters

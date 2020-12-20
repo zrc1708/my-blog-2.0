@@ -282,38 +282,12 @@ filerouter.post('/getfilebycode', async function (ctx) {
 
 // 文件下载
 filerouter.get('/downloadfile', async function (ctx) {
-    // const code = ctx.request.body.code
-
-    // const connection = await Mysql.createConnection(mysql_nico)
-    // const sql = `Select * from files where code = '${code}';`
-    // const [rs] = await connection.query(sql);
-
-    // return ctx.body = {
-    //     rs,
-    //     code:200,
-    // };
-
-    // const name = ctx.params.path;
-    // console.log(ctx.query.path);
-
-    // 设置实体头（表示消息体的附加信息的头字段）,提示浏览器以文件下载的方式打开
-    // 也可以直接设置 ctx.set("Content-disposition", "attachment; filename=" + fileName);
-    // ctx.attachment(filename);
-    // await send(ctx, filename, { root: __dirname + '/'+filepath });
-
     let path = ctx.query.path
     let name = ctx.query.name
     path = path.slice(1).replace(`/${name}`,'')
-// console.log(path);
-    // console.log(name);
-    // console.log( __dirname +path);
 
     ctx.attachment(name);
     await send(ctx, name, { root: __dirname +path});
-
-    // ctx.attachment('野兽先辈.jpg');
-    // await send(ctx, '野兽先辈.jpg', { root: __dirname +'\\files\\zhangsan' });
-    
 });
 
 module.exports = filerouter

@@ -13,6 +13,7 @@ export default {
     div{
         text-align: center;
         margin-bottom: 1em;
+        margin-top: 1em;
         span{
             display: block;
         }

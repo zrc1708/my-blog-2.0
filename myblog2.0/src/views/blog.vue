@@ -23,6 +23,8 @@
     </div>
     <!-- github快捷按钮 -->
     <my-github></my-github>
+    <!-- 天气预报 -->
+    <my-weather></my-weather>
   </div>
 </template>
 <script>
@@ -32,6 +34,7 @@ import myarticle from '../components/article.vue'
 import blackboard from '../components/blackboard.vue'
 import mycloud from '../components/cloud.vue'
 import github from '../components/github.vue'
+import weather from '../components/weather.vue'
 
 export default {
   components:{
@@ -41,10 +44,12 @@ export default {
     'my-blackboard':blackboard,
     'my-mycloud':mycloud,
     'my-github':github,
+    'my-weather':weather,
   },
   data() {
     return {
-        labelList:[]
+        labelList:[],
+        weather:''
     }
   },
   created() {
@@ -52,6 +57,7 @@ export default {
         this.getArticlesCount(),
         this.getImage()
         this.login()
+        this.getWeather()
   },
   methods: {
     async login(){
@@ -64,6 +70,7 @@ export default {
       if(res.code==200){
         this.$store.commit('setUserName',res.rs[0].username)
         this.$store.commit('setUserId',res.rs[0].id)
+        this.$store.commit('setUserBirthtime',res.rs[0].birthtime)
         this.$cookie.set('rememberme',true,{expires: 7})
       }
       
@@ -96,6 +103,12 @@ export default {
     getImage(){
         let image = new Image()
         image.src = '../assets/macOS-Big-Sur-Daylight-Wallpaper-iDownloadBlog.jpg'
+    },
+    // 获取天气
+    async getWeather(){
+      let {data} = await this.$http.get('https://www.tianqiapi.com/api/?version=v1&appid=99248416&appsecret=g1fjlGJD')
+      this.weather = data.data
+      console.log(this.weather);
     }
   },
   watch:{

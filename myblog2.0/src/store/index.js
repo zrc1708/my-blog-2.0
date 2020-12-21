@@ -10,7 +10,8 @@ export default new Vuex.Store({
     articleNum:0,
     labelNum:0,
     userName:'',
-    userId:''
+    userId:'',
+    userBirthtime:''
   },
   mutations: {
     setArticleId(state,val){
@@ -30,6 +31,9 @@ export default new Vuex.Store({
     },
     setUserId(state,val){
       state.userId = val
+    },
+    setUserBirthtime(state,val){
+      state.userBirthtime = val
     }
   },
   actions: {

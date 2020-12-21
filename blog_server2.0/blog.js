@@ -543,4 +543,19 @@ articlerouters.get('/getcomment/:articleid/:pagesize/:currentpage', async functi
     };
 });
 
+// 获取个人相关信息
+articlerouters.get('/getmyinformation/:userid', async function (ctx) {
+    let userid = ctx.params.userid
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `select * from comment where comment.userid = '${userid}';`
+    const [rs] = await connection.query(sql);
+    connection.end(function(err){})
+
+    return ctx.body = {
+        arr:rs,
+        code:200,
+    };
+});
+
 module.exports = articlerouters

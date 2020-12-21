@@ -6,6 +6,9 @@ import store from './store'
 import '../src/assets/css/global.css'
 // import '../src/assets/css/font-awesome.min.css'
 
+// 引入live2D相关
+import './live2D/autoload'
+
 import Cookies from 'js-cookie'
 Vue.prototype.$cookie = Cookies
 

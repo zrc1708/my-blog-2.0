@@ -10,6 +10,7 @@ import clarticle from '../components/classarticle.vue'
 import blog from '../views/blog.vue'
 import login from '../views/login.vue'
 import files from '../views/files.vue'
+import userspace from '../components/userspace.vue'
 
 Vue.use(VueRouter)
 
@@ -24,6 +25,7 @@ Vue.use(VueRouter)
       {path:'/blog/search',component:search},
       {path:'/blog/clarticle',component:clarticle},
       {path:'/blog/filebox',component:files},
+      {path:'/blog/userspace',component:userspace},
     ]},
   ]
 

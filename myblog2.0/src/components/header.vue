@@ -9,6 +9,7 @@
                 <li @click="move('/blog/articlelist')">主页</li>
                 <li @click="move('/blog/allarticle')">归档</li>
                 <li @click="move('/blog/filebox')">文件箱</li>
+                <li @click="move('/blog/userspace')">个人空间</li>
                 <li @click="move('/blog/me')">关于站长</li>
                 <!--清除浮动样式-->
                 <div style="clear:both;"></div>

@@ -69,3 +69,6 @@ html,body{
 .my-input:hover{
     border-color: #c0c4cc;
 }
+#waifu-tool{
+    font-size: 16px;
+}

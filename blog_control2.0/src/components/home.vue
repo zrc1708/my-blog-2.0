@@ -29,6 +29,10 @@
                         <i class="el-icon-user"></i>
                         <span slot="title">自我介绍</span>
                     </el-menu-item>
+                    <el-menu-item index="alluser">
+                        <i class="el-icon-user-solid"></i>
+                        <span slot="title">用户管理</span>
+                    </el-menu-item>
                     </el-menu>
                 </el-aside>
                 <el-main>

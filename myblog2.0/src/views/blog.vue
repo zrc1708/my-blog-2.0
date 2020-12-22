@@ -24,7 +24,7 @@
     <!-- github快捷按钮 -->
     <my-github></my-github>
     <!-- 天气预报 -->
-    <my-weather></my-weather>
+    <my-weather :weather="weather"></my-weather>
   </div>
 </template>
 <script>
@@ -70,6 +70,7 @@ export default {
       if(res.code==200){
         this.$store.commit('setUserName',res.rs[0].username)
         this.$store.commit('setUserId',res.rs[0].id)
+        sessionStorage.setItem('userId',res.rs[0].id)
         this.$store.commit('setUserBirthtime',res.rs[0].birthtime)
         this.$cookie.set('rememberme',true,{expires: 7})
       }
@@ -107,8 +108,7 @@ export default {
     // 获取天气
     async getWeather(){
       let {data} = await this.$http.get('https://www.tianqiapi.com/api/?version=v1&appid=99248416&appsecret=g1fjlGJD')
-      this.weather = data.data
-      console.log(this.weather);
+      this.weather = data
     }
   },
   watch:{

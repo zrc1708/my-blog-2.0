@@ -3,7 +3,7 @@
         <div id="app">
             <div class="markdown-body" v-html="html" v-highlight></div>
         </div>
-        <div id="comment">
+        <div id="comment" v-if="$store.state.userId">
             <div class="title">
                 <span>评论</span>
                 <label>

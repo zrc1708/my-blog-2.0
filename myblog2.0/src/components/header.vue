@@ -43,7 +43,9 @@ export default {
 
             this.$router.push({
                 path:url,
-            })
+            },
+            onComplete => {},
+            onAbort => {})
         },
         search(){
             if(this.$route.query.searchtitle==this.searchdata){
@@ -60,6 +62,7 @@ export default {
             this.$store.commit('setUserName','')
             this.$store.commit('setUserId','')
             this.$cookie.remove('rememberme')
+            this.$router.push('/blog/articlelist')
         }
     },
 }

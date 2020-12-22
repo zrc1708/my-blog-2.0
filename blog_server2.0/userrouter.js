@@ -154,6 +154,20 @@ userrouter.post('/adduser', async function (ctx) {
         code:200,
     };
 });
+
+// 获取所有用户接口
+userrouter.get('/getalluser', async function (ctx) {
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `select * from user where id != 1;`
+    const [rs] = await connection.query(sql);
+
+    connection.end(function(err){})
+
+    return ctx.body = {
+        arr:rs,
+        code:200,
+    };
+});
     
 
 module.exports = userrouter

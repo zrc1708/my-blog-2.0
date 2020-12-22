@@ -11,6 +11,7 @@ import blog from '../views/blog.vue'
 import login from '../views/login.vue'
 import files from '../views/files.vue'
 import userspace from '../components/userspace.vue'
+import error from '../components/error.vue'
 
 Vue.use(VueRouter)
 
@@ -26,11 +27,22 @@ Vue.use(VueRouter)
       {path:'/blog/clarticle',component:clarticle},
       {path:'/blog/filebox',component:files},
       {path:'/blog/userspace',component:userspace},
+      {path:'/blog/error',component:error},
     ]},
   ]
 
 const router = new VueRouter({
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if(
+    (to.path=='/blog/filebox'||to.path=='/blog/userspace')&&!sessionStorage.getItem('userId')
+  ){
+    next('/blog/error')
+  }else{
+    next()
+  }
 })
 
 export default router

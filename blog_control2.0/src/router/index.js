@@ -9,6 +9,7 @@ import mysort from '../components/mysort'
 import mylabel from '../components/mylabel'
 import me from '../components/me'
 import changearticle from '../components/changearticle.vue'
+import alluser from '../components/alluser.vue'
 
 Vue.use(VueRouter)
 
@@ -21,7 +22,8 @@ Vue.use(VueRouter)
       {path:'/mysort',component:mysort},
       {path:'/mylabel',component:mylabel},
       {path:'/me',component:me},
-      {path:'/changearticle',component:changearticle}
+      {path:'/changearticle',component:changearticle},
+      {path:'/alluser',component:alluser}
     ]}
 ]
 

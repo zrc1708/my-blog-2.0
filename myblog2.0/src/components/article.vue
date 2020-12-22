@@ -2,7 +2,7 @@
     <div id="app">
        <div class="article" @click="readArticle">{{article.title}}</div>
        <ul>
-            <li><i></i>{{article.date.split('T')[0]}}</li>
+            <li><i></i>{{article.date.split(' ')[0]}}</li>
             <li @click="read('sort',article.sortname)"><i></i>{{article.sortname}}</li>
             <li @click="read('label',article.labelname)"><i></i>{{article.labelname}}</li>
             <!--清除浮动样式-->

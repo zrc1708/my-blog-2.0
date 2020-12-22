@@ -1,10 +1,10 @@
 <template>
     <div id="app">
        <div class="row">
-           用户名:<span>张三</span>
+           用户名:<span>{{$store.state.userName}}</span>
        </div>
        <div class="row">
-           在<span>{{date[0]}}</span><span>{{date[1]}}</span>，您注册了本站
+           在<span>{{$store.state.userBirthtime}}</span>，您注册了本站
        </div>
        <div class="row">
            您一共发表了<span>{{comment.all}}</span>篇评论，其中好评<span>{{comment.recommend}}</span>篇，差评<span>{{comment.all-comment.recommend}}</span>篇
@@ -36,9 +36,6 @@ export default {
                             this.comment.recommend++
                         }
                     });
-                    // 格式化日期
-                    this.date = this.$store.state.userBirthtime.split('T')
-                    this.date[1] = this.date[1].substring(0,this.date[1].length - 5)
                 }
             }else{
                 setTimeout(() => {

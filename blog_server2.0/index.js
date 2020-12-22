@@ -24,36 +24,46 @@
     }));
     app.use(cors());//解决跨域问题
     
-    // app.use(async(ctx, next)=> {
-    //     var token = ctx.headers.authorization;
-    //     if (ctx.request.url!=='/deleteArticles'&&
-    //         ctx.request.url!=='/deleteSort'&&
-    //         ctx.request.url!=='/changeArticle'&&
-    //         ctx.request.url!=='/changeSort'&&
-    //         ctx.request.url!=='/changeLabel'&&
-    //         ctx.request.url!=='/addSort'&&
-    //         ctx.request.url!=='/addLabel'&&
-    //         ctx.request.url!=='/uploadfile'&&
-    //         ctx.request.url!=='/deleteLabel'&&
-    //         ctx.request.url!=='/getuser') {
-    //         return await next();
-    //     }else if(!token){
-    //         return ctx.body={
-    //             code:'444',
-    //             message:"该功能只有登录用户可以使用",
-    //         }
-    //     }else{
-    //         jwt.verify(token,'niconiconi',(error,decoded)=>{
-    //             if(error){
-    //                 return ctx.body={
-    //                     code:'445',
-    //                     message:"token无效",
-    //                 }
-    //             }
-    //         })
-    //         await next();
-    //     }
-    // })
+    app.use(async(ctx, next)=> {
+        // var token = ctx.headers.authorization;
+        var token = ctx.cookies.get('token') || ctx.headers.authorization;
+        if (ctx.request.url!=='/deleteArticles'&&
+            ctx.request.url!=='/deleteSort'&&
+            ctx.request.url!=='/changeArticle'&&
+            ctx.request.url!=='/changeSort'&&
+            ctx.request.url!=='/changeLabel'&&
+            ctx.request.url!=='/addSort'&&
+            ctx.request.url!=='/addLabel'&&
+            ctx.request.url!=='/uploadfile'&&
+            ctx.request.url!=='/deleteLabel'&&
+            ctx.request.url!=='/getuser'&&
+            ctx.request.url!=='/getfile'&&
+            ctx.request.url!=='/uploadfile'&&
+            ctx.request.url!=='/mkdir'&&
+            ctx.request.url!=='/rename'&&
+            ctx.request.url!=='/remove'&&
+            ctx.request.url!=='/getallfilesbysql'&&
+            ctx.request.url!=='/getfilebycode'&&
+            ctx.request.url!=='/getuser'&&
+            ctx.request.url!=='/getalluser') {
+            return await next();
+        }else if(!token){
+            return ctx.body={
+                code:'444',
+                message:"该功能只有登录用户可以使用",
+            }
+        }else{
+            jwt.verify(token,'niconiconi',(error,decoded)=>{
+                if(error){
+                    return ctx.body={
+                        code:'445',
+                        message:"token无效",
+                    }
+                }
+            })
+            await next();
+        }
+    })
 
     //加载静态资源
     app.use(Static('./static', {

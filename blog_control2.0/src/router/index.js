@@ -10,6 +10,7 @@ import mylabel from '../components/mylabel'
 import me from '../components/me'
 import changearticle from '../components/changearticle.vue'
 import alluser from '../components/alluser.vue'
+import allfile from '../components/allfile.vue'
 
 Vue.use(VueRouter)
 
@@ -23,7 +24,8 @@ Vue.use(VueRouter)
       {path:'/mylabel',component:mylabel},
       {path:'/me',component:me},
       {path:'/changearticle',component:changearticle},
-      {path:'/alluser',component:alluser}
+      {path:'/alluser',component:alluser},
+      {path:'/allfile',component:allfile}
     ]}
 ]
 

@@ -33,6 +33,10 @@
                         <i class="el-icon-user-solid"></i>
                         <span slot="title">用户管理</span>
                     </el-menu-item>
+                    <el-menu-item index="allfile">
+                        <i class="el-icon-folder-opened"></i>
+                        <span slot="title">文件管理</span>
+                    </el-menu-item>
                     </el-menu>
                 </el-aside>
                 <el-main>

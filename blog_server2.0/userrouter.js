@@ -28,7 +28,7 @@ userrouter.post('/blogcheckuser', async ctx => {
     const password = ctx.request.body.password;        
 
     const connection = await Mysql.createConnection(mysql_nico)
-    const sql = `SELECT * FROM user where username = '${username}' and password= '${password}'`;
+    const sql = `SELECT * FROM user where username = '${username}' and password= '${password}' and state = '0';`
     const [rs] = await connection.query(sql);
 
     if(rs.length===1){
@@ -82,7 +82,7 @@ userrouter.post('/automaticlogin', async ctx => {
 
         let time = new Date().Format("yyyy-MM-dd hh:mm:ss")
 
-        const sql2 = `UPDATE user SET token = '${token}',logintime = '${time}' WHERE id = '${rs[0].id}';`
+        const sql2 = `UPDATE user SET token = '${token}',logintime = '${time}' WHERE id = '${rs[0].id}' and state = '0';`
         await connection.query(sql2);
 
         ctx.cookies.set('token', token, {
@@ -168,6 +168,35 @@ userrouter.get('/getalluser', async function (ctx) {
         code:200,
     };
 });
-    
+
+// 封禁用户
+userrouter.post('/deleteuser', async function (ctx) {
+    const userid = ctx.request.body.userid;
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `UPDATE user SET state = '1' WHERE id = '${userid}';`
+    const [rs] = await connection.query(sql);
+    connection.end(function(err){})
+
+    return ctx.body = {
+        arr:rs,
+        code:200,
+    };
+});
+
+// 解封用户
+userrouter.post('/changeuser', async function (ctx) {
+    const userid = ctx.request.body.userid;
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `UPDATE user SET state = '0' WHERE id = '${userid}';`
+    const [rs] = await connection.query(sql);
+    connection.end(function(err){})
+
+    return ctx.body = {
+        arr:rs,
+        code:200,
+    };
+});
 
 module.exports = userrouter

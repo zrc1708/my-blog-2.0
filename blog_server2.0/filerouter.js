@@ -253,11 +253,46 @@ filerouter.post('/remove', async function (ctx) {
     };
 });
 
-// 获取所有文件
-filerouter.get('/getallfilesbysql', async function (ctx) {
+// 获取文件提取码
+filerouter.get('/getallfilecode', async function (ctx) {
+    let path = ctx.query['path[]']
+
+    let sqlpath = './files'
+    path.forEach(item=>{
+        sqlpath+=`/${item}`
+    })
 
     const connection = await Mysql.createConnection(mysql_nico)
-    const sql = `Select * from files ;`
+    const sql = `Select * from files where path = '${sqlpath}';`
+    const [rs] = await connection.query(sql);
+
+    return ctx.body = {
+        rs,
+        code:200,
+    };
+});
+
+// 获取文件总量
+filerouter.get('/getallfilescount', async function (ctx) {
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `Select count(*) from files;`
+    const [rs] = await connection.query(sql);
+
+    return ctx.body = {
+        rs,
+        code:200,
+    };
+});
+
+// 获取所有文件
+filerouter.get('/getallfilesbysql/:pageSize/:curPage', async function (ctx) {
+    let pageSize = ctx.params.pageSize  //一页多少条记录
+    let curPage = ctx.params.curPage    //当前的页数
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `Select files.id, files.name, files.size ,files.type ,files.path ,files.userid ,files.code,
+                user.username from files,user  where files.userid=user.id
+                order by id desc limit ${(curPage-1)*pageSize},${pageSize};`
     const [rs] = await connection.query(sql);
 
     return ctx.body = {
@@ -288,6 +323,25 @@ filerouter.get('/downloadfile', async function (ctx) {
 
     ctx.attachment(name);
     await send(ctx, name, { root: __dirname +path});
+});
+
+// 管理员删除文件
+filerouter.post('/admdeletefile', async function (ctx) {
+    const path = ctx.request.body.path
+    const id = ctx.request.body.id
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `delete from files where id = '${id}';`
+    const [rs] = await connection.query(sql);
+
+    await fs.unlink(path.trim(), (err) => {
+        if (err) throw err;
+    });
+
+    return ctx.body = {
+        // rs,
+        code:200,
+    };
 });
 
 module.exports = filerouter

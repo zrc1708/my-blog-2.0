@@ -45,7 +45,8 @@
             ctx.request.url!=='/getallfilesbysql'&&
             ctx.request.url!=='/getfilebycode'&&
             ctx.request.url!=='/getuser'&&
-            ctx.request.url!=='/getalluser') {
+            ctx.request.url!=='/getalluser'&&
+            ctx.request.url!=='/admdeletefile') {
             return await next();
         }else if(!token){
             return ctx.body={

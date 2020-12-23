@@ -23,6 +23,7 @@
             <my-fileline v-for="file in filesList" :key="file" :file="file" 
             @cd='cd'
             @rename='rename'
+            @copy='copy'
             @remove='remove'></my-fileline>
         </div>
     </div>
@@ -196,6 +197,34 @@ export default {
                 a.setAttribute('download', `${res.rs[0].name}`)
                 a.click()
             }
+        },
+        // 拷贝提取码
+        async copy(file){
+            let path = [this.$store.state.userName]
+            this.pathArr.forEach(item =>{
+                path.push(item.name)
+            })
+            path.push(file.name)
+
+            let {data:res} = await this.$http.get(`/getallfilecode`,{
+                params: {
+                    path
+                }
+            })
+            if(res.code==200){
+                this.copyToClip(res.rs[0].code)
+                alert('复制成功')
+            }else{
+                alert('复制失败')
+            }
+        },
+        copyToClip(content){
+            var aux = document.createElement("input"); 
+            aux.setAttribute("value", content); 
+            document.body.appendChild(aux); 
+            aux.select();
+            document.execCommand("copy"); 
+            document.body.removeChild(aux);
         }
     },
     components:{

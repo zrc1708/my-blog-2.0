@@ -5,10 +5,12 @@
             <el-table :data="filesList" style="width: 100%" stripe border>
                 <el-table-column type="index"></el-table-column>
                 <el-table-column prop="name" label="文件名" ></el-table-column>
-                <el-table-column prop="type" label="类型"></el-table-column>
+                <el-table-column prop="type" label="类型"
+                :filters="filesFilter" :filter-method="filterHandler"></el-table-column>
                 <el-table-column prop="size" label="大小"></el-table-column>
                 <el-table-column prop="code" label="提取码"></el-table-column>
-                <el-table-column prop="username" label="所属用户"></el-table-column>
+                <el-table-column prop="username" label="所属用户"
+                :filters="userFilter" :filter-method="filterHandler"></el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button size="mini" @click="deleteFile(scope.row)" >删除</el-button>
@@ -41,6 +43,10 @@ export default {
             curPage:1,
             // 一页展示的记录数
             pageSize:10,
+            // 文件类型过滤器
+            filesFilter:[],
+            // 所属用户过滤器
+            userFilter:[]
         }
     },
     created() {
@@ -57,11 +63,37 @@ export default {
             if (data.code !== 200) return this.$message('登录失效')
             this.articleCount = data.rs[0]['count(*)']
         },
-        // 获取用户列表
+        // 获取文件列表
         async getFilesList(pageSize,curPage){
             const {data} = await this.$http.get(`getallfilesbysql/${pageSize}/${curPage}`)
             if (data.code !== 200) return this.$message('登录失效')
+            let typeArr = []
+            let userArr = []
+            data.rs.forEach(file=>{
+                typeArr.push(file.type)
+                userArr.push(file.username)
+            })
+            typeArr = [...new Set(typeArr)];
+            userArr = [...new Set(userArr)];
+            this.filesFilter = []
+            this.userFilter = []
+            typeArr.forEach(type => {
+                this.filesFilter.push({
+                    text:type,
+                    value:type
+                })
+            });
+            userArr.forEach(username => {
+                this.userFilter.push({
+                    text:username,
+                    value:username
+                })
+            });
             this.filesList = data.rs
+        },
+        filterHandler(value, row, column) {
+            const property = column['property'];
+            return row[property] === value;
         },
         // 页码改变
         handleSizeChange(val) {

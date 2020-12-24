@@ -1,20 +1,19 @@
  <template>
     <div>
         <el-card>
+            <el-button class="btn" @click="backToAitlcle">返回文章列表</el-button>
             <el-table :data="userList" style="width: 100%" stripe border>
                 <el-table-column type="index"></el-table-column>
-                <el-table-column prop="username" label="用户名" ></el-table-column>
-                <el-table-column prop="logintime" label="登录时间"></el-table-column>
-                <el-table-column prop="birthtime" label="注册时间"></el-table-column>
-                <el-table-column label="状态">
+                <el-table-column prop="content" label="内容" ></el-table-column>
+                <el-table-column prop="recommend" label="类型" :filters="typeFilter" :filter-method="filterHandler">
                     <template slot-scope="scope">
-                        {{scope.row.state==0?'正常':'封禁'}}
+                        {{scope.row.recommend==1?'推荐':'不推荐'}}
                     </template>
                 </el-table-column>
+                <el-table-column prop="username" label="评论人" :filters="userFilter" :filter-method="filterHandler"></el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
-                        <el-button size="mini" @click="deleteUser(scope.row)" v-if="scope.row.state==0">封禁</el-button>
-                        <el-button size="mini" @click="changeUser(scope.row)" v-else>解封</el-button>
+                        <el-button size="mini" @click="deleteComment(scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -43,6 +42,10 @@ export default {
             curPage:1,
             // 一页展示的记录数
             pageSize:10,
+            // 类型过滤器
+            typeFilter:[],
+            // 用户过滤器
+            userFilter:[]
         }
     },
     created() {
@@ -50,50 +53,59 @@ export default {
         this.getUserList(this.pageSize,this.curPage)
     },
     methods: {
-        // 获取用户总量
-        async countUser(){
-            const {data} = await this.$http.get(`getalluserscount`)
-            if (data.code !== 200) return this.$message('登录失效')
-            this.articleCount = data.rs[0]['count(*)']-1
+        // 返回文章列表
+        backToAitlcle(){
+            this.$router.push(`/myarticle?curpage=${this.$route.query.oldpage}`)
         },
-        // 获取用户列表
+        // 获取文章评论总量
+        async countUser(){
+            const {data} = await this.$http.get(`getcommentcount/${this.$route.query.id}`)
+            if (data.code !== 200) return this.$message('登录失效')
+            this.articleCount = data.total
+        },
+        // 获取评论列表
         async getUserList(pageSize,curPage){
-            const {data} = await this.$http.get(`getalluser/${pageSize}/${curPage}`)
+            const {data} = await this.$http.get(`getcomment/${this.$route.query.id}/${pageSize}/${curPage}`)
             if (data.code !== 200) return this.$message('登录失效')
             this.userList = data.arr
-        },
-        //封禁用户 
-        deleteUser(item){
-            this.$confirm('此操作将封禁该用户, 是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(async () => {
-                const {data} =  await this.$http.post(`deleteuser`,{userid:item.id})
-                this.$message({
-                    type: 'success',
-                    message: '封禁成功!'
-                });
-                this.countUser()
-                this.getUserList(this.pageSize,this.curPage)
-            }).catch(() => {
-                this.$message({
-                    type: 'info',
-                    message: '已取消'
-                });          
+            let typeArr = []
+            let userArr = []
+            data.arr.forEach(file=>{
+                typeArr.push(file.recommend)
+                userArr.push(file.username)
+            })
+            typeArr = [...new Set(typeArr)];
+            userArr = [...new Set(userArr)];
+            this.typeFilter = []
+            this.userFilter = []
+            typeArr.forEach(type => {
+                this.typeFilter.push({
+                    text:type==1?'推荐':'不推荐',
+                    value:type
+                })
+            });
+            userArr.forEach(username => {
+                this.userFilter.push({
+                    text:username,
+                    value:username
+                })
             });
         },
-        // 解封用户
-        changeUser(item){
-            this.$confirm('此操作将解封该用户, 是否继续?', '提示', {
+        filterHandler(value, row, column) {
+            const property = column['property'];
+            return row[property] === value;
+        },
+        //删除评论 
+        deleteComment(item){
+            this.$confirm('此操作将删除该评论, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(async () => {
-                const {data} =  await this.$http.post(`changeuser`,{userid:item.id})
+                const {data} =  await this.$http.post(`deletecomment`,{id:item.id})
                 this.$message({
                     type: 'success',
-                    message: '解封成功!'
+                    message: '删除成功!'
                 });
                 this.countUser()
                 this.getUserList(this.pageSize,this.curPage)
@@ -119,5 +131,8 @@ export default {
 <style lang="less" scoped>
 .paper{
     text-align: center;
+}
+.btn{
+    margin-bottom: 20px;
 }
 </style>

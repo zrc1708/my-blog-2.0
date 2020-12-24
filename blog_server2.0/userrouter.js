@@ -155,12 +155,29 @@ userrouter.post('/adduser', async function (ctx) {
     };
 });
 
-// 获取所有用户接口
-userrouter.get('/getalluser', async function (ctx) {
+// 获取用户总量
+userrouter.get('/getalluserscount', async function (ctx) {
+    
     const connection = await Mysql.createConnection(mysql_nico)
-    const sql = `select * from user where id != 1;`
+    const sql = `Select count(*) from user;`
     const [rs] = await connection.query(sql);
+    connection.end(function(err){})
 
+    return ctx.body = {
+        rs,
+        code:200,
+    };
+});
+
+// 获取所有用户接口
+userrouter.get('/getalluser/:pageSize/:curPage', async function (ctx) {
+    let pageSize = ctx.params.pageSize  //一页多少条记录
+    let curPage = ctx.params.curPage    //当前的页数
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `select * from user where id != 1
+                order by id desc limit ${(curPage-1)*pageSize},${pageSize};`
+    const [rs] = await connection.query(sql);
     connection.end(function(err){})
 
     return ctx.body = {

@@ -194,7 +194,6 @@ filerouter.post('/rename', async function (ctx) {
     const name = ctx.request.body.name
     const userid = ctx.request.body.userid
 
-    console.log(oldname);
 
     // 检测新文件名是否重名
     try {
@@ -265,6 +264,7 @@ filerouter.get('/getallfilecode', async function (ctx) {
     const connection = await Mysql.createConnection(mysql_nico)
     const sql = `Select * from files where path = '${sqlpath}';`
     const [rs] = await connection.query(sql);
+    connection.end(function(err){})
 
     return ctx.body = {
         rs,
@@ -277,6 +277,7 @@ filerouter.get('/getallfilescount', async function (ctx) {
     const connection = await Mysql.createConnection(mysql_nico)
     const sql = `Select count(*) from files;`
     const [rs] = await connection.query(sql);
+    connection.end(function(err){})
 
     return ctx.body = {
         rs,
@@ -294,6 +295,7 @@ filerouter.get('/getallfilesbysql/:pageSize/:curPage', async function (ctx) {
                 user.username from files,user  where files.userid=user.id
                 order by id desc limit ${(curPage-1)*pageSize},${pageSize};`
     const [rs] = await connection.query(sql);
+    connection.end(function(err){})
 
     return ctx.body = {
         rs,
@@ -308,6 +310,7 @@ filerouter.post('/getfilebycode', async function (ctx) {
     const connection = await Mysql.createConnection(mysql_nico)
     const sql = `Select * from files where code = '${code}';`
     const [rs] = await connection.query(sql);
+    connection.end(function(err){})
 
     return ctx.body = {
         rs,
@@ -333,6 +336,7 @@ filerouter.post('/admdeletefile', async function (ctx) {
     const connection = await Mysql.createConnection(mysql_nico)
     const sql = `delete from files where id = '${id}';`
     const [rs] = await connection.query(sql);
+    connection.end(function(err){})
 
     await fs.unlink(path.trim(), (err) => {
         if (err) throw err;

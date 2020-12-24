@@ -11,10 +11,10 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="detail" label="文章介绍" ></el-table-column>
-                <el-table-column prop="sortname" label="文章分类" 
+                <el-table-column prop="sortname" label="文章分类" width='100'
                 :filters="sortFilterList"
                 :filter-method="Filter"></el-table-column>
-                <el-table-column prop="labelname" label="文章标签"
+                <el-table-column prop="labelname" label="文章标签" width='100'
                 :filters="labelFilterList"
                 :filter-method="Filter" ></el-table-column>
                 <el-table-column label="操作">
@@ -22,6 +22,7 @@
                         <el-button size="mini" @click="openchange(scope.row)">修改信息</el-button>
                         <el-button size="mini" @click="change(scope.row)">修改文章</el-button>
                         <el-button size="mini" @click="opendelete(scope.row)">删除</el-button>
+                        <el-button size="mini" @click="goToComments(scope.row)">查看评论</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -30,6 +31,7 @@
                 <el-pagination layout="prev, pager, next" 
                 :total="articleCount"
                 :page-size="pageSize"
+                :current-page="curPage"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange">
                 </el-pagination>
@@ -94,8 +96,11 @@ export default {
         }
     },
     created() {
-        this.getArticles(this.pageSize,this.curPage)
+        if(this.$route.query.curpage){
+            this.curPage = this.$route.query.curpage
+        }
         this.getArticlesCount()
+        this.getArticles(this.pageSize,this.curPage)
         this.getSortList()
         this.getLabelList()
     },
@@ -114,7 +119,6 @@ export default {
             let count = data.arr[0]['count(*)']
             this.articleCount = count
             this.pageCount =  Math.ceil(count/this.pageSize)
-            // console.log(this.articleCount);
         },
         // 获取分类列表
         async getSortList(){
@@ -198,6 +202,10 @@ export default {
         // 修改文章
         change(item){
             this.$router.push(`/changearticle?id=${item.id}`)
+        },
+        // 查看评论
+        goToComments(item){
+            this.$router.push(`/comments?id=${item.id}&oldpage=${this.curPage}`)
         }
     },
 }

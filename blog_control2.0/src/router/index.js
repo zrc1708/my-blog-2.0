@@ -11,6 +11,7 @@ import me from '../components/me'
 import changearticle from '../components/changearticle.vue'
 import alluser from '../components/alluser.vue'
 import allfile from '../components/allfile.vue'
+import comments from '../components/comments.vue'
 
 Vue.use(VueRouter)
 
@@ -25,7 +26,8 @@ Vue.use(VueRouter)
       {path:'/me',component:me},
       {path:'/changearticle',component:changearticle},
       {path:'/alluser',component:alluser},
-      {path:'/allfile',component:allfile}
+      {path:'/allfile',component:allfile},
+      {path:'/comments',component:comments},
     ]}
 ]
 

@@ -543,6 +543,21 @@ articlerouters.get('/getcomment/:articleid/:pagesize/:currentpage', async functi
     };
 });
 
+// 删除评论接口
+articlerouters.post('/deletecomment', async function (ctx) {
+    const id = ctx.request.body.id
+
+    const connection = await Mysql.createConnection(mysql_nico)
+    const sql = `DELETE FROM comment WHERE id = '${id}'`
+    const [rs] = await connection.query(sql);
+    connection.end(function(err){})
+
+    return ctx.body = {
+        message:"删除成功！",
+        code:200,
+    };
+});
+
 // 获取个人相关信息
 articlerouters.get('/getmyinformation/:userid', async function (ctx) {
     let userid = ctx.params.userid

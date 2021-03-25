@@ -7,7 +7,7 @@
                 <el-table-column prop="title" label="文章名" ></el-table-column>
                 <el-table-column label="发表日期" >
                     <template slot-scope="scope">
-                        {{scope.row.date.split('T')[0]}}
+                        {{scope.row.date | toMyDate}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="detail" label="文章介绍" ></el-table-column>
@@ -70,6 +70,8 @@
     </div>
 </template>
 <script>
+import moment from '../utils/moment'
+
 export default {
     data(){
         return{
@@ -90,9 +92,14 @@ export default {
             labelFilterList:[]
         }
     },
+    filters:{
+        toMyDate(value){
+            return moment(value).format("YYYY-MM-DD HH:mm:ss")
+        }
+    },
     computed: {
         newDate(){
-            return this.changed.date.split('T')[0]
+            return moment(this.$store.state.userBirthtime).format("YYYY-MM-DD HH:mm:ss")
         }
     },
     created() {

@@ -26,4 +26,9 @@ export default {
 .app_router{
   flex: 1;
 }
+  @media(max-width:433px){
+    #wife{
+      display: none;
+    }
+  }
 </style>

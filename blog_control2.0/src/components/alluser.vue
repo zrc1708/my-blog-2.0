@@ -4,8 +4,16 @@
             <el-table :data="userList" style="width: 100%" stripe border>
                 <el-table-column type="index"></el-table-column>
                 <el-table-column prop="username" label="用户名" ></el-table-column>
-                <el-table-column prop="logintime" label="登录时间"></el-table-column>
-                <el-table-column prop="birthtime" label="注册时间"></el-table-column>
+                <el-table-column prop="logintime" label="登录时间">
+                    <template slot-scope="scope">
+                        {{scope.row.logintime | toMyDate}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="birthtime" label="注册时间">
+                    <template slot-scope="scope">
+                        {{scope.row.birthtime | toMyDate}}
+                    </template>
+                </el-table-column>
                 <el-table-column label="状态">
                     <template slot-scope="scope">
                         {{scope.row.state==0?'正常':'封禁'}}
@@ -31,6 +39,8 @@
     </div>
 </template>
 <script>
+import moment from 'moment'
+
 export default {
     data() {
         return {
@@ -48,6 +58,11 @@ export default {
     created() {
         this.countUser()
         this.getUserList(this.pageSize,this.curPage)
+    },
+    filters:{
+        toMyDate(value){
+            return moment(value).format("YYYY-MM-DD HH:mm:ss")
+        }
     },
     methods: {
         // 获取用户总量

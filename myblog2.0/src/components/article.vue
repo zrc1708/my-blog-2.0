@@ -2,7 +2,7 @@
     <div id="app">
        <div class="article" @click="readArticle">{{article.title}}</div>
        <ul>
-            <li><i></i>{{article.date.split(' ')[0]}}</li>
+            <li><i></i>{{articleDate}}</li>
             <li @click="read('sort',article.sortname)"><i></i>{{article.sortname}}</li>
             <li @click="read('label',article.labelname)"><i></i>{{article.labelname}}</li>
             <!--清除浮动样式-->
@@ -14,8 +14,15 @@
     </div>
 </template>
 <script>
+import moment from '../utils/moment'
+
 export default {
     props: ['article'],
+    computed:{
+        articleDate(){
+            return moment(this.article.date).format("YYYY-MM-DD HH:mm:ss")
+        }
+    },
     methods: {
         readArticle(){
             let id = this.article.id+'?'+Math.random()

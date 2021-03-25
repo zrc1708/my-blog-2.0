@@ -13,6 +13,8 @@ import files from '../views/files.vue'
 import userspace from '../components/userspace.vue'
 import error from '../components/error.vue'
 
+import store from '../store'
+
 Vue.use(VueRouter)
 
   const routes = [
@@ -37,7 +39,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if(
-    (to.path=='/blog/filebox'||to.path=='/blog/userspace')&&!sessionStorage.getItem('userId')
+    (to.path=='/blog/filebox'||to.path=='/blog/userspace')&&(!store.state.userId)
   ){
     next('/blog/error')
   }else{

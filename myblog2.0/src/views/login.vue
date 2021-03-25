@@ -62,6 +62,7 @@ export default {
 
                 this.$store.commit('setUserName',user.username)
                 this.$store.commit('setUserId',user.id)
+                this.$store.commit('setUserBirthtime',user.birthtime)
 
                 this.username = ''
                 this.password = ''

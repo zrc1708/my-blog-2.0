@@ -4,7 +4,7 @@
            用户名:<span>{{$store.state.userName}}</span>
        </div>
        <div class="row">
-           在<span>{{$store.state.userBirthtime}}</span>，您注册了本站
+           在<span>{{birthtime}}</span>，您注册了本站
        </div>
        <div class="row">
            您一共发表了<span>{{comment.all}}</span>篇评论，其中好评<span>{{comment.recommend}}</span>篇，差评<span>{{comment.all-comment.recommend}}</span>篇
@@ -12,6 +12,8 @@
     </div>
 </template>
 <script>
+import moment from '../utils/moment'
+
 export default {
     data () {
         return {
@@ -24,6 +26,11 @@ export default {
     },
     mounted(){
         this.getMyInformation()
+    },
+    computed:{
+        birthtime(){
+            return moment(this.$store.state.userBirthtime).format("YYYY-MM-DD HH:mm:ss")
+        }
     },
     methods: {
         async getMyInformation(){

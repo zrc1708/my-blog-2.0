@@ -34,13 +34,12 @@ export default {
         // 登录
       async login(){
         const {data} = await this.$http.post('checkuser',this.loginform)
-        // console.log(data);
-        window.sessionStorage.setItem('token',data.token)
-        window.sessionStorage.setItem('name',data.rs[0].username)
         if(data.code===201) 
-          return this.$message.error('登录失败')
+            return this.$message.error('登录失败')
         else{
             this.$message.success('登录成功')
+            window.sessionStorage.setItem('token',data.token)
+            window.sessionStorage.setItem('name',data.rs[0].username)
             this.$router.push({
                 path:`/home`,
                 // query:{articleId:id}

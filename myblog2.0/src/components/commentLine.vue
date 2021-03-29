@@ -31,7 +31,8 @@ export default {
     },
     computed:{
         content(){
-            return this.comment.content.replace('\n','<br/>')
+            var reg=/(傻瓜)|(笨蛋)|(蠢猪)/g
+            return this.comment.content.replace('\n','<br/>').replace(reg,'*')
         }
     },
     methods:{

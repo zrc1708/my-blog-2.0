@@ -119,7 +119,7 @@ export default {
                     type: 'success',
                     message: '删除成功!'
                 });
-                this.getFilesList()
+                this.getFilesList(this.pageSize,this.curPage)
             }).catch(() => {
                 this.$message({
                     type: 'info',

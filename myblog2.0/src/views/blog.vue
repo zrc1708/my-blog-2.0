@@ -62,17 +62,25 @@ export default {
   methods: {
     async login(){
       // 没有设置自动登录
-      if(!this.$cookie.get('rememberme')) return
+      // if(!this.$cookie.get('rememberme')) return
       // 用户已手动登录
       if(this.$store.state.userName) return
 
-      let {data:res} =await this.$http.post('/automaticlogin')
-      if(res.code==200){
-        this.$store.commit('setUserName',res.rs[0].username)
-        this.$store.commit('setUserId',res.rs[0].id)
-        sessionStorage.setItem('userId',res.rs[0].id)
-        this.$store.commit('setUserBirthtime',res.rs[0].birthtime)
-        this.$cookie.set('rememberme',true,{expires: 7})
+      // 未设置自动登录，普通登录刷新页面
+      if(sessionStorage.getItem('userId')){
+        this.$store.commit('setUserName',sessionStorage.getItem('userName'))
+        this.$store.commit('setUserId',sessionStorage.getItem('userId'))
+        this.$store.commit('setUserBirthtime',sessionStorage.getItem('userBirthtime'))
+      }else if(this.$cookie.get('rememberme')){
+        // 自动登录
+        let {data:res} =await this.$http.post('/automaticlogin')
+        if(res.code==200){
+          this.$store.commit('setUserName',res.rs[0].username)
+          this.$store.commit('setUserId',res.rs[0].id)
+          sessionStorage.setItem('userId',res.rs[0].id)
+          this.$store.commit('setUserBirthtime',res.rs[0].birthtime)
+          this.$cookie.set('rememberme',true,{expires: 7})
+        }
       }
       
     },

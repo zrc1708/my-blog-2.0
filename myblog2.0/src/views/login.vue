@@ -60,6 +60,10 @@ export default {
                 }
                 let user = res.data.rs[0]
 
+                // sessionStorage.setItem('token',res.data.token)
+                sessionStorage.setItem('userName',user.username)
+                sessionStorage.setItem('userId',user.id)
+                sessionStorage.setItem('userBirthtime',user.birthtime)
                 this.$store.commit('setUserName',user.username)
                 this.$store.commit('setUserId',user.id)
                 this.$store.commit('setUserBirthtime',user.birthtime)

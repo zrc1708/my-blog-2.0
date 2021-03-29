@@ -62,6 +62,7 @@ export default {
             this.$store.commit('setUserName','')
             this.$store.commit('setUserId','')
             this.$cookie.remove('rememberme')
+            sessionStorage.clear()
             this.$router.push('/')
         }
     },

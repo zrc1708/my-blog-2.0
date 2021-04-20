@@ -5,7 +5,7 @@
             <el-table :data="articleList" style="width: 100%" stripe border>
                 <el-table-column type="index"></el-table-column>
                 <el-table-column prop="title" label="文章名" ></el-table-column>
-                <el-table-column label="发表日期" >
+                <el-table-column label="发表日期" width='200'>
                     <template slot-scope="scope">
                         {{scope.row.date | toMyDate}}
                     </template>
